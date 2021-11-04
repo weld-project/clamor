@@ -1,0 +1,7 @@
+|x:vec[i64]|
+result(for(x,        
+	appender[vec[i32]],
+	|b,i,e|
+        let y = cudf[load_outlinks,vec[vec[i32]]](e);
+        for(y, b, |b2, i2, e2| merge(b2, e2)        
+        )))

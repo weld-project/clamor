@@ -1,0 +1,2 @@
+|suppliers: vec[i32]|
+result(for(suppliers, appender, |b,i,e| merge(b, e)))

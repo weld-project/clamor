@@ -1,0 +1,6 @@
+|lineitems: vec[{i32, i32, i32, i32, f64, f64, f64, i32, i32, i32, i32, i32, i32, i32}]|
+    result(for(
+        lineitems,
+        merger[f64,+],
+        |b,i,e| if (e.$8 >= 19940101 && e.$8 < 19950101 && e.$5 >= 0.05 && e.$5 <= 0.07 && e.$2 < 24,
+                    merge(b, e.$4 * (f64(1.0) - e.$5)), b)))

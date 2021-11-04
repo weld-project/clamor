@@ -1,0 +1,1 @@
+|x:vec[i32], a:i64|result(for(x, merger[i64,+], |b,i,e|merge(b,cudf[traverse_list,i64](e, a))))

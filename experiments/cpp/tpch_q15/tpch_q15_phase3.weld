@@ -1,0 +1,2 @@
+|top_supplier: vec[{i32, i32, f32}]|
+sort(top_supplier, |e1, e2| if(e1.$0 < e2.$0, -1, if (e1.$0 > e2.$0, 1, 0)))

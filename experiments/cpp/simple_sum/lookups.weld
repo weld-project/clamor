@@ -1,0 +1,3 @@
+|x:vec[i32], indexes:vec[i64]|
+let doubled = result(for(x, appender[i32], |b,i,e| merge(b, 2*e)));
+result(for(indexes, merger[i64,+], |b2,i2,e2| merge(b2, i64(lookup(doubled, e2)))))

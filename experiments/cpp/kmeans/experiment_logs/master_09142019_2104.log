@@ -1,0 +1,47 @@
+Worker: ec2-34-207-161-213.compute-1.amazonaws.com
+Worker: ec2-3-89-107-37.compute-1.amazonaws.com
+Worker: ec2-18-206-137-119.compute-1.amazonaws.com
+Worker: ec2-3-83-83-213.compute-1.amazonaws.com
+Worker: ec2-54-174-49-176.compute-1.amazonaws.com
+Worker: ec2-3-86-115-64.compute-1.amazonaws.com
+Worker: ec2-3-83-24-42.compute-1.amazonaws.com
+Worker: ec2-35-171-8-199.compute-1.amazonaws.com
+Worker: ec2-34-201-52-3.compute-1.amazonaws.com
+Worker: ec2-3-82-129-93.compute-1.amazonaws.com
+Worker: ec2-54-236-160-70.compute-1.amazonaws.com
+Worker: ec2-35-171-21-158.compute-1.amazonaws.com
+Worker: ec2-3-83-107-172.compute-1.amazonaws.com
+Worker: ec2-18-233-167-73.compute-1.amazonaws.com
+Worker: ec2-54-209-21-139.compute-1.amazonaws.com
+Worker: ec2-18-212-13-174.compute-1.amazonaws.com
+Worker: ec2-54-159-207-45.compute-1.amazonaws.com
+Worker: ec2-3-87-4-56.compute-1.amazonaws.com
+Worker: ec2-3-84-12-109.compute-1.amazonaws.com
+Worker: ec2-34-227-163-124.compute-1.amazonaws.com
+Worker: ec2-54-158-66-33.compute-1.amazonaws.com
+Worker: ec2-54-174-209-244.compute-1.amazonaws.com
+Worker: ec2-54-165-58-228.compute-1.amazonaws.com
+Worker: ec2-52-90-137-43.compute-1.amazonaws.com
+Worker: ec2-3-86-139-85.compute-1.amazonaws.com
+[2019-09-14 21:04:00.931] [debug] [worker-server.h:42] Manager: ec2-34-203-227-46.compute-1.amazonaws.com:40000
+[2019-09-14 21:04:44.493] [debug] [dsm-client.cc:104] Failed to register worker ec2-34-203-227-46.compute-1.amazonaws.com:70000: error code 14: Connection reset by peer
+[2019-09-14 21:04:44.494] [debug] [worker-server.cc:133] add client
+[2019-09-14 21:04:44.496] [debug] [worker-server.h:127] Cache server listening on ec2-34-203-227-46.compute-1.amazonaws.com:70000
+[2019-09-14 21:04:44.496] [debug] [cluster.cc:24] in map
+HTTP/1.1 200 OK
+x-amz-id-2: H+xYAQoP0fhiuYM9cx41cr7TcUyTSm+LsTcAQBvSk25mokUFpfEkCJr4A9fjYtj70wdoXhEfDX4=
+x-amz-request-id: 9711BAAB828897B0
+Date: Sat, 14 Sep 2019 21:04:45 GMT
+Last-Modified: Fri, 13 Sep 2019 20:24:18 GMT
+ETag: "6c13f3236a674b42e7920768a029a2b1-5961"
+x-amz-version-id: _S1JGaE_iL4UA.B7nIhHK8iQinDOD4Wi
+Accept-Ranges: bytes
+Content-Type: binary/octet-stream
+Content-Length: 100000000000
+Server: AmazonS3
+
+got filesize
+[2019-09-14 21:04:44.533] [debug] [fault-handler.cc:198] In read handler with page 555555a, address 555555a54010, task id -1:-1
+[2019-09-14 21:04:44.537] [debug] [dsm-client.cc:64] Couldn't get page 555555a: 14: Connect Failed
+[2019-09-14 21:04:44.537] [debug] [fault-handler.cc:225] Read handler failed: -1
+[2019-09-14 21:04:44.537] [debug] [fault-handler.cc:122] Failed to get read permission

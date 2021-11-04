@@ -1,0 +1,12 @@
+|lineitems: vec[{i32, i32, i32, i32, f64, f64, f64, i32, i32, i32, i32, i32, i32, i32}]|
+  let revenue =
+    tovec(result(for(
+      lineitems,
+      dictmerger[i32, f64, +],
+      |b,i,e|
+        if(e.$8 >= 19960101 && e.$8 < 19960401,
+           merge(b, {e.$1, e.$4 * (f64(1.0) - e.$5)}),
+           b))));
+  let max_revenue =
+    result(@(distribute:false)for(revenue, merger[f64, max], |b,i,e| merge(b, e.$1)));
+  result(@(distribute:false)for(revenue, appender, |b,i,e| if(e.$1 == max_revenue, merge(b, e), b))) 

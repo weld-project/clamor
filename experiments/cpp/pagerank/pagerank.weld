@@ -1,0 +1,10 @@
+|in: vec[vec[i32]], old_ranks: vec[i32]|
+result(for(in, appender[i32], |b, i, e|
+        merge(b, result(for(
+                    e,
+                    merger[i32,+],
+                    |b2,i2,e2| merge(b2, lookup(old_ranks, i64(e2)))
+                ))
+        )
+    ))
+

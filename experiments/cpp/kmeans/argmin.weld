@@ -1,0 +1,11 @@
+# Get the index of the minimum element.
+|x:vec[f64]|
+let min_index = 0L;
+let cur_index = 0L;
+let res = iterate({min_index, cur_index},
+  |e| if (lookup(x, e.$1) < lookup(x, e.$0),
+    if (e.$1 < (len(x)-1L), {{e.$1, e.$1+1L}, true}, {{e.$1, e.$1+1L}, false}),
+    if (e.$1 < (len(x)-1L), {{e.$0, e.$1+1L}, true}, {{e.$0, e.$1+1L}, false})
+  )
+);
+res.$0

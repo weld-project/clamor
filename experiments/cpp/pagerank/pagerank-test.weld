@@ -1,0 +1,11 @@
+|x:vec[vec[vec[i64]]]|
+result(for(x,
+	merger[i64, +],
+	|b,i,e| merge(b,
+	    result(for(e,
+		    merger[i64, +],
+		    |b2,i2,e2| merge(b2,
+			result(for(e2,
+				merger[i64,+],
+				|b3,i3,e3|			    
+				merge(b3, e3)))))))))

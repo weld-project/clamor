@@ -1,0 +1,15 @@
+|lineitems: vec[{i32, i32, i32, i32, f64, f64, f64, i32, i32, i32, i32, i32, i32, i32}],
+ orders: vec[{i32, i32}]|
+let t = cudf[print_time, i32](1);
+let order_table = result(@(distribute:false)for(orders, dictmerger[i32, i32, +], |b,i,e| merge(b,e)));
+let t2 = cudf[print_time, i32](1);
+let join =
+  tovec(result(for(
+    lineitems,
+    dictmerger[i32, i32, max],
+    |b,i,e|
+      if (e.$7 < e.$9,
+          let lookup_res = optlookup(order_table, e.$0);  
+          if (lookup_res.$0, merge(b, {e.$0, lookup_res.$1}), b),
+          b))));
+result(for(join, vecmerger[i64, +]([i64(0),i64(0),i64(0),i64(0),i64(0)]), |b,i,e| merge(b, {i64(e.$1-1), i64(1)})))

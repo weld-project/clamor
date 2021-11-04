@@ -1,0 +1,123 @@
+# Return the l2 distance between x and y.
+macro norm(x, y) = (
+    result(for(zip(x, y), merger[f64, +], |b,i,e| merge(b, (e.$0-e.$1)*(e.$0-e.$1))))
+);
+
+# Get the index of the minimum element.
+macro argmin(x) = (
+    let min_index = 0L;
+    let cur_index = 0L;
+    let res = iterate({min_index, cur_index},
+	|e| if (lookup(x, e.$1) < lookup(x, e.$0),
+	    if (e.$1 < (len(x)-1L), {{e.$1, e.$1+1L}, true}, {{e.$1, e.$1+1L}, false}),
+	    if (e.$1 < (len(x)-1L), {{e.$0, e.$1+1L}, true}, {{e.$0, e.$1+1L}, false})
+	)
+    );
+    res.$0
+);
+
+# Get the index of the closest mean.
+macro argmin_norm(point, means) = (
+    let min_index = 0L;
+    let cur_index = 0L;
+    let min_norm = norm(point, lookup(means, 0L));
+    let res = iterate({{min_index, min_norm}, cur_index},
+	|e|
+	let cur_norm = norm(point, lookup(means, e.$1));
+	if (cur_norm < e.$0.$1,
+	if (e.$1 < (len(means)-1L), {{{e.$1, cur_norm}, e.$1+1L}, true}, {{{e.$1, cur_norm}, e.$1+1L}, false}),
+	if (e.$1 < (len(means)-1L), {{e.$0, e.$1+1L}, true}, {{e.$0, e.$1+1L}, false})
+	)
+    );
+    res.$0.$0
+);
+
+# Main k-means implementation.
+# Choice of initial means is delegated to the user for now.
+|x:vec[vec[f64]], means: vec[vec[f64]], k: i64, iters: i64| # each point is a d-dimensional vector
+# do some preprocessing
+# this operation should be distributed on the cluster
+#let inputs = result(for(x,
+#	appender[vec[f64]],
+#	|b,i,e| merge(b,
+#	    result(for(e,
+#		    appender[f64],
+#		    |b2,i2,e2| merge(b2, e2*2.0))))));
+let inputs = x;
+
+let means_init = result(@(distribute:false)for(means,
+	appender[vec[f64]],
+	|b,i,e| merge(b,
+	    result(for(e,
+		    appender[f64],
+		    |b2,i2,e2| merge(b2, e2))))));
+
+let iter_idx = 0L;
+let res = iterate({means_init, iter_idx},
+    |z|
+    let time = cudf[print_time,i32]();
+    
+    # Find the index of the min mean for each point.
+    # distributed
+    let cluster_assignments =
+    result(for(inputs,
+	    appender[i64](len(inputs)),	    
+	    |b,i,point| merge(b, argmin_norm(point, z.$0))));
+#	    |b,i,point| merge(b, cudf[argmin_norm, i64](point, z.$0))));
+#    let cluster_assignments = cudf[argmin_norm_loop, vec[i64]](inputs, z.$0);
+    let time = cudf[print_time,i32]();
+ 
+    # create a flattened list of means (on driver)  
+    let d = len(lookup(inputs, 0L));
+    let sums_init = result(for(rangeiter(0L, k*d, 1L),
+	    appender[f64], # concatenation of k length-d sums
+	    |b,i,e| merge(b, 0.0)
+	));
+
+    let counts_init = result(for(rangeiter(0L, k, 1L),
+	    appender[i64],
+	    |b,i,e| merge(b, 0L)
+	));	    
+    
+    # Individual sums and counts will be distributed, then final vecmerger happens on driver	
+    let elemwise_aggregate = for(zip(inputs, cluster_assignments),
+	vecmerger[f64, +](sums_init),
+	|b,i,e|
+	for(e.$0, b,
+	    |b2, i2, e2| merge(b, {e.$1*d + i2, e2})
+	)
+    );
+
+    let counts_aggregate = for(cluster_assignments,
+	vecmerger[i64, +](counts_init),
+	|b,i,e| merge(b, {e, 1L}));    
+    
+    let elemwise_sums = result(elemwise_aggregate);
+    let cluster_counts = result(counts_aggregate);    
+    
+    # reshape into one d-dimensional sum per cluster
+    let cluster_sums = result(
+	for(rangeiter(0L, k, 1L),
+	    appender[vec[f64]],
+	    |b,i,e| merge(b, slice(elemwise_sums, e*d, d))
+	)
+    );	
+    
+    # On driver	
+    let new_means = result(@(distribute:false)for(
+	    zip(cluster_sums, cluster_counts),
+	    appender[vec[f64]], # note each mean is a d-dimensional point
+	    |b,i,e| merge(b, result(for(e.$0,
+			appender[f64],
+			|b2, i2, e2| merge(b2, e2/f64(e.$1))) # divide each element of mean by cluster count
+		))
+	)
+    );
+    
+    let updated_idx = z.$1 + 1L;
+    
+    # update means and break if done
+    if (updated_idx < iters, {{new_means, updated_idx}, true}, {{new_means, updated_idx}, false})
+);
+
+res.$0

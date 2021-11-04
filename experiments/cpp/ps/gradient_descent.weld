@@ -1,0 +1,5 @@
+|items: vec[vec[{vec[u64], u64}]], hm_addr: i64, weights_start: u64, weights_end: u64|
+result(for(items,
+	appender[{vec[{u64, f64}], f64}], # returns pointers to sparse weight updates
+	|b,i,e|	
+	merge(b, cudf[compute_gradient,{vec[{u64, f64}], f64}](e, hm_addr, weights_start, weights_end))))

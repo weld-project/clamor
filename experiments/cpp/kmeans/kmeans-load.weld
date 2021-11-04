@@ -1,0 +1,9 @@
+|x:vec[vec[f64]], means: vec[vec[f64]], k: i64, iters: i64| # each point is a d-dimensional vector
+let time = cudf[print_time,i32]();
+result(for(x,
+	merger[f64, +],
+	|b,i,e| merge(b,
+	    result(for(e,
+		    merger[f64, +],
+		    |b2,i2,e2| merge(b2, e2))))))
+

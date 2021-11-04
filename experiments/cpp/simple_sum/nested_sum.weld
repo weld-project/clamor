@@ -1,0 +1,4 @@
+|x:vec[i32]|result(
+    let y = result(for(x, appender[i64], |b,i,e| merge(b, 2L*i64(e))));
+    for(y, merger[i64,+], |b,i,e| merge(b,e))
+)

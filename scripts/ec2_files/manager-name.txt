@@ -1,0 +1,2 @@
+ec2-34-222-214-247.us-west-2.compute.amazonaws.com
+

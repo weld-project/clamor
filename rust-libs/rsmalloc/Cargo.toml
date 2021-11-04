@@ -1,0 +1,13 @@
+[package]
+name="rsmalloc"
+version="0.1.0"
+build="build.rs"
+readme="README.md"
+
+[dependencies]
+libc="0.2.0"
+
+[lib]
+path="lib.rs"
+bench=false
+crate-type=["cdylib", "rlib"]

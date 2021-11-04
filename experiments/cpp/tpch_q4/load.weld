@@ -1,0 +1,4 @@
+|lineitems: vec[{i32, i32, i32, i32, f64, f64, f64, i32, i32, i32, i32, i32, i32, i32}],
+ orders: vec[{i32, i32, i32, i32, i32}]|
+let res1 = result(for(lineitems, merger[i64, +], |b,i,e| merge(b, i64(e.$0 + e.$13))));
+result(for(orders, merger[i64, +], |b,i,e| merge(b, i64(e.$0 + e.$4))))

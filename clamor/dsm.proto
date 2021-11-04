@@ -1,0 +1,199 @@
+syntax="proto3";
+
+/* For handling client requests for pages. */
+
+package dsm;
+
+service DSM {
+  //  rpc RegisterClient(Client) returns (Empty) {}
+  rpc RegisterWorker(Client) returns (Empty) {}
+
+  rpc GetPage(Page) returns (Page) {}
+  rpc GetResults(Empty) returns (ResultList) {}
+  rpc GetResultPages(ResultRequest) returns (Pages) {}
+  rpc MapS3(S3Data) returns (Empty) {}
+
+  rpc SubmitTask(Task) returns (Result) {}
+  rpc Return(Response) returns (Empty) {}
+
+  rpc Shutdown(Empty) returns (Empty) {}
+}
+
+service Worker {
+  // cache methods
+  rpc InvalidatePage(InvalidateRequest) returns (Page) {}
+
+  // computation methods
+  rpc RunProgram(WeldTask) returns (Empty) {} /* asynchronous call; requires explicit Return reverse RPC to respond */
+
+  rpc Heartbeat(Empty) returns (Alive) {}
+  rpc Shutdown(Empty) returns (Empty) {}
+
+  rpc FetchPage(Page) returns (Page) {}
+}
+
+enum Permission {
+  NONE = 0;
+  READ = 1;
+  WRITE = 2;
+  S3 = 3;
+  READ_ONLY = 4;
+}
+
+enum TaskStatus {
+  RUNNING = 0;
+  FETCH_FAIL = 1;
+  WORKER_FAIL = 2;
+  SUCCESS = 3;
+  RETRY = 4;
+  ABORT_REPLICA = 5;
+}
+
+message PageNum {
+  uint64 pagenum = 1;
+}
+
+message InvalidateRequest {
+  PageNum pagenum = 1;
+  bool clear_cache = 2;
+  bool send_data = 3;
+  bool invalidate_driver_cache = 4;
+  bool is_peer = 5;
+}
+
+message Page {
+  Permission perm = 1;
+  PageNum pagenum = 2;
+  bytes pagedata = 3;
+  string url = 4; /* if page should be downloaded from cloud */
+
+  /* byte range to download */
+  uint64 byte_start = 5;
+  uint64 byte_end = 6;
+
+  int64 stage_id = 7;
+  int64 partition_id = 8;
+
+  int32 error_code = 9;
+
+  bool local = 10;
+  bool ptop = 11; /* indicates to make request from peer indicated in url */
+  uint32 port = 12;
+}
+
+message ResultList {
+  repeated Pages pages = 1;
+}
+
+message ResultRequest {
+  int64 task_id = 1;
+}
+
+message Pages {
+  uint64 start_addr = 1;
+  int64 stage_id = 2;
+  int64 task_id = 3;
+  repeated Page pages = 4;
+}
+
+message PageRequest {
+  PageNum pagenum = 1;
+  Permission perm = 2;
+}
+
+message Client {
+  string ip = 1;
+  string port = 2;
+
+  bool is_driver = 3;
+}
+
+message MemInfo {
+  uint64 start = 1;
+  uint64 end = 2;
+}
+
+message S3Data {
+  uint64 start = 1;
+  uint64 size = 2;
+  string url = 3;
+  bool local = 4;
+}
+
+/* RPC from driver that wants to dispatch a task */
+message Task {
+  repeated uint64 data_addrs = 1;
+  uint64 num_partitions = 2;
+  string code = 3;
+
+  PerfTimes times = 4;
+
+  bool return_vectors = 5;
+}
+
+/* response to the driver calling dispatch */
+message Result {
+  repeated uint64 results_list = 1; 
+}
+
+message Response {
+  TaskStatus status = 7;
+
+  uint64 stage_id = 1;
+  uint64 partition_id = 2;
+  
+  uint64 res = 3; /* Pointer to location of result in shared memory */
+
+  uint64 failed_page = 4; /* If page fetch failure, put failed page number here */
+
+  repeated uint64 pages_read = 5;
+  repeated uint64 pages_written = 6;
+
+  repeated Page written_pages = 8;
+
+  PerfTimes times = 9;
+}
+
+message PerfTimes {
+  double compile_time = 1;
+  double request_time_driver = 2;
+  double request_time_peer = 3;
+  double compute_time = 4;
+  uint64 num_peer_served = 5;
+}
+
+message CacheServer {
+  string ip = 1;
+  string port = 2;
+
+  // Partition, unused.
+  PageNum start_page = 3;
+  PageNum end_page = 4;
+
+  bool disabled = 5;
+
+  int32 partition = 6;
+}
+
+message WeldTask {
+  uint64 data = 1; /* pointer to args struct */
+  string code = 2; /* code to parse, compile, and execute locally */
+
+  uint64 stage_id = 3;
+  uint64 partition_id = 4;
+
+  /* allocated heap region for this task */
+  uint64 heap_start = 5;
+  uint64 heap_end = 6;
+
+  repeated CacheServer cache_servers = 7;
+
+  bool return_vectors = 8;
+}
+
+message Alive {
+  bool alive = 1;
+}
+
+message Empty {
+}

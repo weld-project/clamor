@@ -1,0 +1,6 @@
+|lookup_idxs:vec[vec[vec[f64]]], kdtree_addr:i64|
+result(for(lookup_idxs,
+	merger[f64,+],
+	|b,i,e|	
+	merge(b, cudf[r_lookup,f64](kdtree_addr, e))
+    ))

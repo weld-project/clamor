@@ -1,0 +1,7 @@
+|x:vec[vec[u8]], re:i64|
+result(for(x,
+	merger[i64, +],
+	|b, i, e| merge(b,
+	    result(for(e,
+		    merger[i64, +],
+		    |b2, i2, e2| merge(b2, i64(e2)))))))		    

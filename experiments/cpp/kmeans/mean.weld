@@ -1,0 +1,3 @@
+# Compute the mean.
+|x: vec[f64]|
+sum(x)/len(x) 

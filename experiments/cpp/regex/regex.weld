@@ -1,0 +1,9 @@
+|x:vec[vec[u8]], re:i64|
+result(
+    for(x,
+	merger[i64, +],
+	|b,i,e|
+	merge(b,cudf[match,i64](e, re)
+	)
+    )
+)

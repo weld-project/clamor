@@ -1,0 +1,7 @@
+|x: vec[vec[{i32, i64, i64}]]| # x is the url to load data from
+result(for(x, 
+        appender[vec[{vec[u64], u64}]],
+	|b,i,e|
+	merge(b, cudf[load_zipf_data, vec[{vec[u64], u64}]](e))
+        # for(y, b, |b2, i2, e2| merge(b2, e2)        
+    ))

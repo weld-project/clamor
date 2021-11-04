@@ -1,0 +1,6 @@
+|suppliers: vec[i32], revenue: vec[{i32, f64}]|
+  result(@(distribute:false)for(
+  suppliers,
+  appender,
+    |b,i,e|
+      for (revenue, b, |b2,i2,e2| if (e2.$0 == e, merge(b2, {e, e2.$1}), b))))

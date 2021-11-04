@@ -1,0 +1,5 @@
+|x:vec[vec[i64]], hm:i64|
+result(for(x,
+	merger[i64,+],
+	|b,i,e|	
+	merge(b, cudf[r_lookup,i64](e, hm))))

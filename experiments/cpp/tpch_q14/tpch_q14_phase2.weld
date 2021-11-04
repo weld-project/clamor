@@ -1,0 +1,12 @@
+|parts: vec[{i32, i32, i32, i32, i32}], lineitems: vec[{i32, f64}]|
+let t = cudf[print_time, i32](1);
+let items = result(@(distribute:false)for(lineitems, dictmerger[i32, f64, +], |b,i,e| merge(b, e)));
+let t2 = cudf[print_time, i32](1);
+result(@(distribute:false)for(
+  parts,
+  vecmerger[f64, +]([f64(0.0), f64(0.0)]),
+  |b,i,e|
+    let lookup_res = optlookup(items, e.$0);
+    if (lookup_res.$0,
+        if (e.$4 == 1, merge(b, {i64(0), lookup_res.$1}), merge(b, {i64(1), lookup_res.$1})),
+        b)))

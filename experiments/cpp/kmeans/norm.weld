@@ -1,0 +1,4 @@
+# Return the l2 distance between x and y.
+|x: vec[f64], y: vec[f64]| 
+let total = sum(for(zip(x, y), merger[f64, +], |b,i,e| (e.$0-e.$1)*(e.$0-e.$1)));
+sqrt(total)
