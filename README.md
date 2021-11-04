@@ -32,7 +32,7 @@ cargo llvm-6.0 llvm-6.0-dev clang-6.0 zlib1g-dev
 
 Finally, Clamor uses `grpc` and `protobuf` for RPCs:
 ```
-git clone -b $(curl -L https://grpc.io/release) https://github.com/grpc/grpc
+git clone -b v1.15.1 https://github.com/grpc/grpc
 cd grpc
 git submodule update --init
 cd third_party/protobuf
